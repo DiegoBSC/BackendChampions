@@ -1,0 +1,317 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/pro
+                   http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="Diego Acosta" id="script01">
+        <createTable tableName="sec_users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="users_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="sec_roles">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="roles_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="sec_user_rol">
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rol_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_user_rol" columnNames="user_id,rol_id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_rol" baseColumnNames="user_id"
+                                 constraintName="fk_user_id_roles"
+                                 referencedTableName="sec_users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="sec_user_rol" baseColumnNames="rol_id"
+                                 constraintName="fk_rol_id_users"
+                                 referencedTableName="sec_roles" referencedColumnNames="id"/>
+        <createTable tableName="sec_permissions">
+            <column name="id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_permissions" columnNames="id"/>
+        <createTable tableName="sec_rol_permissions">
+            <column name="rol_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="sec_rol_permissions" columnNames="rol_id,permission_id"/>
+        <addForeignKeyConstraint baseTableName="sec_rol_permissions" baseColumnNames="rol_id"
+                                 constraintName="fk_roles_id_roles"
+                                 referencedTableName="sec_roles" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="sec_rol_permissions" baseColumnNames="permission_id"
+                                 constraintName="fk_rol_id_permission"
+                                 referencedTableName="sec_permissions" referencedColumnNames="id"/>
+    </changeSet>
+    <include file="data.sql"/>
+
+    <changeSet id="script-02" author="Diego Acosta">
+
+        <createTable tableName="cam_championships">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="championships_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="start_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(150)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="cam_teams">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="teams_pkey"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name" type="VARCHAR(150)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="cam_championships_teams">
+            <column name="championship_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="cam_championships_teams" columnNames="championship_id,team_id"/>
+        <addForeignKeyConstraint baseTableName="cam_championships_teams" baseColumnNames="championship_id"
+                                 constraintName="fk_championship_id_teams"
+                                 referencedTableName="cam_championships" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="cam_championships_teams" baseColumnNames="team_id"
+                                 constraintName="fk_team_id_championship"
+                                 referencedTableName="cam_teams" referencedColumnNames="id"/>
+
+        <createTable tableName="cam_competitors">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="competitors_pkey"/>
+            </column>
+            <column name="team_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_competitor" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dni" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="type_competitor" defaultValue="PLAYER" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" defaultValue="ACT" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cam_competitors" baseColumnNames="team_id"
+                                 constraintName="fk_team_id_competitor"
+                                 referencedTableName="cam_teams" referencedColumnNames="id"/>
+
+        <createTable tableName="cam_journeys">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="journeys_pkey"/>
+            </column>
+            <column name="championship_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" defaultValue="OPEN" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cam_journeys" baseColumnNames="championship_id"
+                                 constraintName="fk_championship_id_journey"
+                                 referencedTableName="cam_championships" referencedColumnNames="id"/>
+
+        <createTable tableName="cam_matches">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="matches_pkey"/>
+            </column>
+            <column name="journey_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="local_team_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="visit_team_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="match_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="match_time" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="local_goals" type="int" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+            <column name="visit_goals" type="int" defaultValue="0">
+                <constraints nullable="true"/>
+            </column>
+            <column name="location" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" defaultValue="OPEN" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cam_matches" baseColumnNames="journey_id"
+                                 constraintName="fk_journey_id_match"
+                                 referencedTableName="cam_journeys" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="cam_matches" baseColumnNames="local_team_id"
+                                 constraintName="fk_local_team_id_match"
+                                 referencedTableName="cam_teams" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="cam_matches" baseColumnNames="visit_team_id"
+                                 constraintName="fk_visit_team_id_match"
+                                 referencedTableName="cam_teams" referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="cam_matches"
+                             columnNames="journey_id, local_team_id, visit_team_id, location" />
+
+        <createTable tableName="cam_goals_match">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="goals_match_pkey"/>
+            </column>
+            <column name="match_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="competitor_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="goals" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cam_goals_match" baseColumnNames="match_id"
+                                 constraintName="fk_match_id_goals"
+                                 referencedTableName="cam_matches" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="cam_goals_match" baseColumnNames="competitor_id"
+                                 constraintName="fk_competitor_id_goals"
+                                 referencedTableName="cam_competitors" referencedColumnNames="id"/>
+    </changeSet>
+    <changeSet id="script-03" author="Diego Acosta">
+        <addUniqueConstraint tableName="cam_matches"
+                             columnNames="journey_id, local_team_id, visit_team_id" />
+    </changeSet>
+    <changeSet id="script-04" author="Diego Acosta">
+        <createTable tableName="cam_team_result">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="team_result_pkey"/>
+            </column>
+            <column name="match_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="points" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="cam_team_result" baseColumnNames="match_id"
+                                 constraintName="fk_match_id_result"
+                                 referencedTableName="cam_matches" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="cam_team_result" baseColumnNames="team_id"
+                                 constraintName="fk_team_id_result"
+                                 referencedTableName="cam_teams" referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="cam_team_result"
+                             columnNames="match_id, team_id" />
+    </changeSet>
+</databaseChangeLog>
