@@ -11,7 +11,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -19,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class RolPresenter {
 
-    private UUID id;
+    private String id;
     @NotNull
     @Enumerated(EnumType.STRING)
     private EnumRol name;

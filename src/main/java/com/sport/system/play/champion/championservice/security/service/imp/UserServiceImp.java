@@ -6,6 +6,7 @@ import com.sport.system.play.champion.championservice.security.entity.Rol;
 import com.sport.system.play.champion.championservice.security.entity.User;
 import com.sport.system.play.champion.championservice.security.presenter.*;
 import com.sport.system.play.champion.championservice.security.provider.JwtProvider;
+import com.sport.system.play.champion.championservice.security.repository.RolRepository;
 import com.sport.system.play.champion.championservice.security.repository.UserRepository;
 import com.sport.system.play.champion.championservice.security.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -41,6 +42,9 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     private JwtProvider jwtProvider;
+
+    @Autowired
+    private RolRepository rolRepository;
 
     @Override
     public UserPresenter save(UserPresenter userPresenter) {
@@ -115,9 +119,14 @@ public class UserServiceImp implements UserService {
         modelMapper.map(presenter, user);
         user.setPassword(passwordEncoder.encode(presenter.getPassword()));
         user.setRoles(presenter.getRolesPresenter()
-                .stream().map(this::buildEntityRolFromPresenter).collect(Collectors.toSet()));
+                .stream().map(this::getRolesPresenterByDataBase).collect(Collectors.toSet()));
         user.setCreatedDate(new Date());
         return user;
+    }
+
+    private Rol getRolesPresenterByDataBase(RolPresenter presenters){
+        Rol rol = rolRepository.findByName(presenters.getName());
+        return rol.getId() != null ? rol : null;
     }
 
     private Rol buildEntityRolFromPresenter(RolPresenter presenter) {
